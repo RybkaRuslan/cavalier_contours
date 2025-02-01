@@ -3,8 +3,7 @@
 use cavalier_contours::{
     core::math::Vector2,
     polyline::{
-        BooleanOp, PlineBooleanOptions, PlineOffsetOptions, PlineSource, PlineSourceMut,
-        PlineVertex, Polyline,
+        BooleanOp, PlineBooleanOptions, PlineOffsetMethod, PlineOffsetOptions, PlineSource, PlineSourceMut, PlineVertex, Polyline
     },
     static_aabb2d_index::StaticAABB2DIndex,
 };

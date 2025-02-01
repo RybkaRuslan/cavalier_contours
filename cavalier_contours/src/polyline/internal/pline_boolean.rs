@@ -2,7 +2,7 @@ use crate::{
     core::math::dist_squared,
     polyline::{
         seg_midpoint, seg_split_at_point, BooleanOp, BooleanPlineSlice, BooleanResult,
-        BooleanResultInfo, BooleanResultPline, FindIntersectsOptions, PlineBasicIntersect,
+     BooleanResultPline, FindIntersectsOptions, PlineBasicIntersect,
         PlineBooleanOptions, PlineCreation, PlineSource, PlineViewData,
     },
 };
@@ -729,7 +729,7 @@ where
         || pline2.vertex_count() < 2
         || !pline2.is_closed()
     {
-        return BooleanResult::empty(BooleanResultInfo::InvalidInput);
+        return BooleanResult::empty();
     }
 
     let constructed_index;
@@ -761,7 +761,7 @@ where
                 BooleanResult::from_whole_plines(
                     vec![O::create_from(pline2)],
                     Vec::new(),
-                    BooleanResultInfo::Overlapping,
+                  
                 )
             } else if !boolean_info.any_intersects() {
                 // no intersects, returning only one pline if one is inside other or both if they
@@ -770,19 +770,19 @@ where
                     BooleanResult::from_whole_plines(
                         vec![O::create_from(pline2)],
                         Vec::new(),
-                        BooleanResultInfo::Pline1InsidePline2,
+              
                     )
                 } else if is_pline2_in_pline1() {
                     BooleanResult::from_whole_plines(
                         vec![O::create_from(pline1)],
                         Vec::new(),
-                        BooleanResultInfo::Pline2InsidePline1,
+                
                     )
                 } else {
                     BooleanResult::from_whole_plines(
                         vec![O::create_from(pline1), O::create_from(pline2)],
                         Vec::new(),
-                        BooleanResultInfo::Disjoint,
+                  
                     )
                 }
             } else {
@@ -824,7 +824,7 @@ where
                     }
                 }
 
-                BooleanResult::new(pos_plines, neg_plines, BooleanResultInfo::Intersected)
+                BooleanResult::new(pos_plines, neg_plines)
             }
         }
         BooleanOp::And => {
@@ -833,7 +833,7 @@ where
                 BooleanResult::from_whole_plines(
                     vec![O::create_from(pline2)],
                     Vec::new(),
-                    BooleanResultInfo::Overlapping,
+                    
                 )
             } else if !boolean_info.any_intersects() {
                 // no intersects, returning only one pline if one is inside other or none if they
@@ -842,16 +842,16 @@ where
                     BooleanResult::from_whole_plines(
                         vec![O::create_from(pline1)],
                         Vec::new(),
-                        BooleanResultInfo::Pline1InsidePline2,
+                       
                     )
                 } else if is_pline2_in_pline1() {
                     BooleanResult::from_whole_plines(
                         vec![O::create_from(pline2)],
                         Vec::new(),
-                        BooleanResultInfo::Pline2InsidePline1,
+                        
                     )
                 } else {
-                    BooleanResult::empty(BooleanResultInfo::Disjoint)
+                    BooleanResult::empty()
                 }
             } else {
                 // keep all slices from pline1 that are in pline2 and all slices from pline2 that
@@ -876,30 +876,30 @@ where
                     pos_equal_eps,
                 );
 
-                BooleanResult::new(pos_plines, Vec::new(), BooleanResultInfo::Intersected)
+                BooleanResult::new(pos_plines, Vec::new())
             }
         }
         BooleanOp::Not => {
             if boolean_info.completely_overlapping() {
                 // completely overlapping, nothing is left
-                BooleanResult::empty(BooleanResultInfo::Overlapping)
+                BooleanResult::empty()
             } else if !boolean_info.any_intersects() {
                 if is_pline1_in_pline2() {
                     // everything is subtracted (nothing left)
-                    BooleanResult::empty(BooleanResultInfo::Pline1InsidePline2)
+                    BooleanResult::empty()
                 } else if is_pline2_in_pline1() {
                     // negative space island created inside pline1
                     BooleanResult::from_whole_plines(
                         vec![O::create_from(pline1)],
                         vec![O::create_from(pline2)],
-                        BooleanResultInfo::Pline2InsidePline1,
+                       
                     )
                 } else {
                     // disjoint
                     BooleanResult::from_whole_plines(
                         vec![O::create_from(pline1)],
                         Vec::new(),
-                        BooleanResultInfo::Disjoint,
+                       
                     )
                 }
             } else {
@@ -926,31 +926,31 @@ where
                     pos_equal_eps,
                 );
 
-                BooleanResult::new(pos_plines, Vec::new(), BooleanResultInfo::Intersected)
+                BooleanResult::new(pos_plines, Vec::new())
             }
         }
         BooleanOp::Xor => {
             if boolean_info.completely_overlapping() {
-                BooleanResult::empty(BooleanResultInfo::Overlapping)
+                BooleanResult::empty()
             } else if !boolean_info.any_intersects() {
                 if is_pline1_in_pline2() {
                     BooleanResult::from_whole_plines(
                         vec![O::create_from(pline2)],
                         vec![O::create_from(pline1)],
-                        BooleanResultInfo::Pline1InsidePline2,
+                        
                     )
                 } else if is_pline2_in_pline1() {
                     BooleanResult::from_whole_plines(
                         vec![O::create_from(pline1)],
                         vec![O::create_from(pline2)],
-                        BooleanResultInfo::Pline2InsidePline1,
+                       
                     )
                 } else {
                     // disjoint
                     BooleanResult::from_whole_plines(
                         vec![O::create_from(pline1), O::create_from(pline2)],
                         Vec::new(),
-                        BooleanResultInfo::Disjoint,
+                      
                     )
                 }
             } else {
@@ -997,7 +997,7 @@ where
                 );
 
                 remaining1.extend(remaining2);
-                BooleanResult::new(remaining1, Vec::new(), BooleanResultInfo::Intersected)
+                BooleanResult::new(remaining1, Vec::new())
             }
         }
     }
