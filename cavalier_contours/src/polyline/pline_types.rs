@@ -82,6 +82,7 @@ where
             pos_equal_eps: T::from(1e-5).unwrap(),
             slice_join_eps: T::from(1e-4).unwrap(),
             offset_dist_eps: T::from(1e-4).unwrap(),
+            offset_method: PlineOffsetMethod::KeepDistance,
         }
     }
 }
