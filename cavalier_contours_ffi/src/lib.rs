@@ -97,6 +97,7 @@ impl cavc_pline_parallel_offset_o {
             slice_join_eps: self.slice_join_eps,
             offset_dist_eps: self.offset_dist_eps,
             handle_self_intersects: self.handle_self_intersects != 0,
+            offset_method: PlineOffsetMethod::KeepDistance,
         }
     }
 }

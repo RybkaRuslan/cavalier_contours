@@ -246,7 +246,7 @@ fn line_arc_join<T, O>(
     let mut process_intersect = |t: T, intersect: Vector2<T>| {
         let true_line_intr = !is_false_intersect(t);
         let true_arc_intr =
-            point_within_arc_sweep(arc_center, u1.pos(), u2.pos(), u1.bulge_is_neg(), intersect);
+            point_within_arc_sweep(arc_center, u1.pos(), u2.pos(), u1.bulge_is_neg(), intersect, pos_equal_eps);
 
         if true_line_intr && true_arc_intr {
             // trim at intersect
@@ -333,7 +333,7 @@ fn arc_line_join<T, O>(
     let mut process_intersect = |t: T, intersect: Vector2<T>| {
         let true_line_intr = !is_false_intersect(t);
         let true_arc_intr =
-            point_within_arc_sweep(arc_center, v1.pos(), v2.pos(), v1.bulge_is_neg(), intersect);
+            point_within_arc_sweep(arc_center, v1.pos(), v2.pos(), v1.bulge_is_neg(), intersect, pos_equal_eps);
 
         if true_line_intr && true_arc_intr {
             let prev_vertex = result.last().unwrap();
@@ -414,8 +414,8 @@ fn arc_arc_join<T, O>(
     let (arc2_radius, arc2_center) = seg_arc_radius_and_center(*u1, *u2);
 
     let both_arcs_sweep_point = |point: Vector2<T>| {
-        point_within_arc_sweep(arc1_center, v1.pos(), v2.pos(), v1.bulge_is_neg(), point)
-            && point_within_arc_sweep(arc2_center, u1.pos(), u2.pos(), u1.bulge_is_neg(), point)
+        point_within_arc_sweep(arc1_center, v1.pos(), v2.pos(), v1.bulge_is_neg(), point, pos_equal_eps)
+            && point_within_arc_sweep(arc2_center, u1.pos(), u2.pos(), u1.bulge_is_neg(), point, pos_equal_eps)
     };
 
     let mut process_intersect = |intersect: Vector2<T>, true_intersect: bool| {
@@ -651,6 +651,7 @@ fn point_valid_for_offset<P, T>(
     point: Vector2<T>,
     query_stack: &mut Vec<usize>,
     offset_tol: T,
+    pos_equal_eps: T,
 ) -> bool
 where
     P: PlineSource<Num = T> + ?Sized,
@@ -661,7 +662,7 @@ where
     let mut point_valid = true;
     let mut visitor = |i: usize| {
         let j = polyline.next_wrapping_index(i);
-        let closest_point = seg_closest_point(polyline.at(i), polyline.at(j), point);
+        let closest_point = seg_closest_point(polyline.at(i), polyline.at(j), point, pos_equal_eps);
         let dist = dist_squared(closest_point, point);
         point_valid = dist > min_dist;
         if point_valid {
@@ -721,6 +722,7 @@ where
             raw_offset_polyline.at(0).pos(),
             &mut query_stack,
             offset_dist_eps,
+            pos_equal_eps,
         ) {
             // not valid
             return result;
@@ -800,6 +802,7 @@ where
             point,
             query_stack,
             offset_dist_eps,
+            pos_equal_eps,
         )
     };
 
@@ -940,7 +943,7 @@ fn visit_circle_intersects<P, T, F>(
      -> bool {
         // skip false intersects and intersects at start of seg
         !arc_start.fuzzy_eq_eps(intr, pos_equal_eps)
-            && point_within_arc_sweep(arc_center, arc_start, arc_end, bulge < T::zero(), intr)
+            && point_within_arc_sweep(arc_center, arc_start, arc_end, bulge < T::zero(), intr, pos_equal_eps)
     };
 
     let query_results = aabb_index.query(
@@ -1097,6 +1100,7 @@ where
             raw_offset_polyline.at(0).pos(),
             &mut query_stack,
             offset_dist_eps,
+            pos_equal_eps,
         ) {
             return result;
         }
@@ -1160,6 +1164,7 @@ where
             point,
             query_stack,
             offset_dist_eps,
+            pos_equal_eps,
         )
     };
 
