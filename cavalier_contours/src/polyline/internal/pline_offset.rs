@@ -143,6 +143,7 @@ struct JoinParams<T> {
     connection_arcs_ccw: bool,
     /// Epsilon to use for testing if positions are fuzzy equal.
     pos_equal_eps: T,
+    offset_method: T,
 }
 
 /// Join two adjacent raw offset segments where both segments are lines.
@@ -509,7 +510,7 @@ fn arc_arc_join<T, O>(
     }
 }
 
-pub fn create_raw_offset_polyline<P, T, O>(polyline: &P, offset: T, pos_equal_eps: T) -> O
+pub fn create_raw_offset_polyline<P, T, O>(polyline: &P, offset: T, pos_equal_eps: T, offset_method:T) -> O
 where
     P: PlineSource<Num = T> + ?Sized,
     T: Real,
@@ -534,6 +535,7 @@ where
     let join_params = JoinParams {
         connection_arcs_ccw,
         pos_equal_eps,
+        offset_method,
     };
 
     let join_seg_pair = |s1: &RawPlineOffsetSeg<T>, s2: &RawPlineOffsetSeg<T>, result: &mut O| {
@@ -1472,7 +1474,7 @@ where
     result
 }
 
-pub fn parallel_offset<P, T, O>(polyline: &P, offset: T, options: &PlineOffsetOptions<T>) -> Vec<O>
+pub fn parallel_offset<P, T, O>(polyline: &P, offset: T, options: &PlineOffsetOptions<T>, offset_method: T) -> Vec<O>
 where
     P: PlineSource<Num = T> + ?Sized,
     T: Real,
@@ -1494,7 +1496,7 @@ where
         &constructed_index
     };
 
-    let raw_offset: O = create_raw_offset_polyline(polyline, offset, options.pos_equal_eps);
+    let raw_offset: O = create_raw_offset_polyline(polyline, offset, options.pos_equal_eps, offset_method);
     let result = if raw_offset.is_empty() {
         Vec::new()
     } else if polyline.is_closed() && !options.handle_self_intersects {
@@ -1507,7 +1509,7 @@ where
             options,
         )
     } else {
-        let dual_raw_offset = create_raw_offset_polyline(polyline, -offset, options.pos_equal_eps);
+        let dual_raw_offset = create_raw_offset_polyline(polyline, -offset, options.pos_equal_eps, offset_method);
         let slices = slices_from_dual_raw_offsets(
             polyline,
             &raw_offset,
