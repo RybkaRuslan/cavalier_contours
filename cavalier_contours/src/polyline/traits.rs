@@ -1384,7 +1384,7 @@ pub trait PlineSource {
         offset: Self::Num,
         options: &PlineOffsetOptions<Self::Num>,
     ) -> Vec<Self::OutputPolyline> {
-        parallel_offset(self, offset, options)
+        parallel_offset(self, offset, options, offset)
     }
     /// Perform a boolean `operation` between this polyline and another using default options.
     ///
