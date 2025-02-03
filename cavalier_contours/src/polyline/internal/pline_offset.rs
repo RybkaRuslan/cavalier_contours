@@ -159,6 +159,8 @@ fn line_line_join<T, O>(
     let connection_arcs_ccw = params.connection_arcs_ccw;
     let pos_equal_eps = params.pos_equal_eps;
     let offset_method = &params.offset_method;
+
+     println!("offset_method: {:?}", offset_method);
     let v1 = &s1.v1;
     let v2 = &s1.v2;
     let u1 = &s2.v1;
