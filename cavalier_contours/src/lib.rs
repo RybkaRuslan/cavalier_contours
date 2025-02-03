@@ -8,3 +8,9 @@ mod macros;
 #[macro_use]
 pub mod core;
 pub mod polyline;
+
+#[cfg(target_arch = "wasm32")]
+extern crate wasm_bindgen;
+
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;

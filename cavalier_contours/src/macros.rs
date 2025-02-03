@@ -114,7 +114,7 @@ macro_rules! console_log {
                 #[wasm_bindgen(js_namespace = console)]
                 fn log(s: &str);
             }
-            log(&format_args!($($t)*).to_string());
+            unsafe { log(&format_args!($($t)*).to_string()); }
         }
         #[cfg(not(target_arch = "wasm32"))]
         {
@@ -122,3 +122,4 @@ macro_rules! console_log {
         }
     }};
 }
+
